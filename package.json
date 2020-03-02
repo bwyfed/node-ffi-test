@@ -1,0 +1,25 @@
+{
+  "name": "node-ffi-test",
+  "version": "1.0.0",
+  "description": "在Node.js中，使用纯js加载和调用C++动态链接库。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bwyfed/node-ffi-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bwyfed/node-ffi-test/issues"
+  },
+  "homepage": "https://github.com/bwyfed/node-ffi-test#readme",
+  "dependencies": {
+    "ffi-napi": "^2.4.6",
+    "ref-napi": "^1.4.3",
+    "ref-struct-napi": "^1.1.0"
+  }
+}
