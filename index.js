@@ -25,19 +25,38 @@ const int32PtrPtr = ref.refType(int32Ptr);
 
 const libm = ffi.Library('mydll.dll', {
   myAdd: ['string', ['int', 'int', 'string', 'int']],
+  getIntArray: ['void', [intPtr, 'int']],
   mySub: ['int', ['int', 'int']]
 });
 
-let buffer = Buffer.alloc(20);
+// 测试通过出参方式获取一个 BYTE 数组
+// 首先要分配空间
+let buffersize = 10;
+let buffer = Buffer.alloc(buffersize);
 console.log(buffer);
-// var actualString = ref.readCString(buffer, 0);
-// console.log(actualString);
+// 开始测试 char 数组
 console.log('js start to call libm.myAdd');
-const addResult = libm.myAdd(6, 5, buffer, 10);
+let addResult = libm.myAdd(6, 5, buffer, buffersize);
 console.log('addResult is:');
 console.log(addResult, typeof addResult);
-console.log('buffer is', buffer); // 这个buffer存储的还是控制，并未改变
-// console.log(ref.readCString(addResult, 0));
+const actualString = ref.readCString(buffer, 0);
+console.log('actualString:', actualString);
+console.log('buffer is', buffer); // 这个buffer存储的是C++中赋的值
+
+// 开始测试 int 数组
+console.log('js start to call libm.getIntArray');
+let buffer2size = 3;
+let buffer2 = new Buffer(buffer2size * 4);
+addResult = libm.getIntArray(buffer2, 3);
+console.log('addResult is:');
+console.log(addResult, typeof addResult);
+console.log('buffer2 is', buffer2); // 这个buffer存储的是C++中赋的值
+console.log(
+  buffer2.readInt32LE(0),
+  buffer2.readInt32LE(4),
+  buffer2.readInt32LE(8)
+);
+
 const subResult = libm.mySub(10, 7);
 
 // 测试使用结构体和结构体指针，结构体里有其他结构体，复合结构体
