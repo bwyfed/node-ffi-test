@@ -22,31 +22,59 @@ const intPtrPtr = ref.refType(intPtr);
 const int32Ptr = ref.refType(ref.types.int32);
 const int32PtrPtr = ref.refType(int32Ptr);
 // buf.type = int32Ptr;
-const libm = ffi.Library('mydll', {
-  Add: ['int', ['int', 'int']],
-  Sub: ['int', ['int', 'int']],
-  printArray: ['int', [intPtr, 'int']],
-  create_array: [int32Ptr, ['int']],
-  getMemory: ['int', [intPtrPtr, 'int']],
-  getMemory2: ['int', [int32Ptr, 'int']],
-  get_md5_string: ['void', ['string', 'int']]
+
+const libm = ffi.Library('mydll.dll', {
+  myAdd: ['string', ['int', 'int', 'string', 'int']],
+  mySub: ['int', ['int', 'int']]
 });
-const buf2 = Buffer.alloc(ref.sizeof.pointer);
-ref.writePointer(buf2, 0, buf);
 
 let buffer = Buffer.alloc(20);
-//buffer.type = ref.types.CString;
-libm.get_md5_string(buffer, 20);
 console.log(buffer);
-var actualString = ref.readCString(buffer, 0);
-console.log(actualString);
-buffer.type = ref.types.int8;
-console.log(buffer);
-buffer.type = ref.types.int16;
-console.log(buffer);
-console.log(buffer.readInt8());
-console.log(buffer.readInt16BE(0));
-console.log(buffer.readInt32BE(0));
+// var actualString = ref.readCString(buffer, 0);
+// console.log(actualString);
+console.log('js start to call libm.myAdd');
+const addResult = libm.myAdd(6, 5, buffer, 10);
+console.log('addResult is:');
+console.log(addResult, typeof addResult);
+// console.log(ref.readCString(addResult, 0));
+const subResult = libm.mySub(10, 7);
+// console.log(`addResult:${addResult}, subResult:${subResult}`);
+
+// const libm = ffi.Library('mydll.dll', {
+//   Add: ['int', ['int', 'int']],
+//   Sub: ['int', ['int', 'int']]
+// });
+
+// const addResult = libm.Add(6, 5);
+// const subResult = libm.Sub(10, 7);
+// console.log(`addResult:${addResult}, subResult:${subResult}`);
+
+// const libm = ffi.Library('mydll', {
+//   Add: ['int', ['int', 'int']],
+//   Sub: ['int', ['int', 'int']],
+//   printArray: ['int', [intPtr, 'int']],
+//   create_array: [int32Ptr, ['int']],
+//   getMemory: ['int', [intPtrPtr, 'int']],
+//   getMemory2: ['int', [int32Ptr, 'int']],
+//   get_md5_string: ['void', ['string', 'int']]
+// });
+// const buf2 = Buffer.alloc(ref.sizeof.pointer);
+// ref.writePointer(buf2, 0, buf);
+
+// let buffer = Buffer.alloc(20);
+// //buffer.type = ref.types.CString;
+// libm.get_md5_string(buffer, 20);
+// console.log(buffer);
+// var actualString = ref.readCString(buffer, 0);
+// console.log(actualString);
+// buffer.type = ref.types.int8;
+// console.log(buffer);
+// buffer.type = ref.types.int16;
+// console.log(buffer);
+// console.log(buffer.readInt8());
+// console.log(buffer.readInt16BE(0));
+// console.log(buffer.readInt32BE(0));
+
 // libm.getMemory2(buf, size);
 // console.log(buf);
 // console.log(buf.length);
