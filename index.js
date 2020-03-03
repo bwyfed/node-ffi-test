@@ -36,8 +36,44 @@ console.log('js start to call libm.myAdd');
 const addResult = libm.myAdd(6, 5, buffer, 10);
 console.log('addResult is:');
 console.log(addResult, typeof addResult);
+console.log('buffer is', buffer); // 这个buffer存储的还是控制，并未改变
 // console.log(ref.readCString(addResult, 0));
 const subResult = libm.mySub(10, 7);
+
+// 测试使用结构体和结构体指针，结构体里有其他结构体，复合结构体
+const StructType = require('ref-struct-napi');
+
+const time_t = ref.types.int;
+const suseconds_t = ref.types.long;
+
+const TTVal = StructType({
+  aa: time_t,
+  bb: time_t
+});
+const TimeVal = StructType({
+  tv_sec: time_t,
+  tv_usec: time_t,
+  tt: TTVal
+});
+
+const TimeValPtr = ref.refType(TimeVal);
+const lib = new ffi.Library('mydll', {
+  gettimeofday: ['void', [TimeValPtr]]
+});
+let tv = new TimeVal();
+lib.gettimeofday(tv.ref());
+console.log(
+  'tv.tv_sec:',
+  tv.tv_sec,
+  'tv.tv_usec:',
+  tv.tv_usec,
+  ',tv.tt.aa:',
+  tv.tt.aa,
+  ',tv.tt.bb:',
+  tv.tt.bb
+);
+console.log(tv);
+
 // console.log(`addResult:${addResult}, subResult:${subResult}`);
 
 // const libm = ffi.Library('mydll.dll', {
