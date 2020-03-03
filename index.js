@@ -26,7 +26,8 @@ const int32PtrPtr = ref.refType(int32Ptr);
 const libm = ffi.Library('mydll.dll', {
   myAdd: ['string', ['int', 'int', 'string', 'int']],
   getIntArray: ['void', [intPtr, 'int']],
-  mySub: ['int', ['int', 'int']]
+  mySub: ['int', ['int', 'int']],
+  testInvokeCallback: ['void', ['int', 'int', 'string', intPtr]]
 });
 
 // 测试通过出参方式获取一个 BYTE 数组
@@ -39,7 +40,7 @@ console.log('js start to call libm.myAdd');
 let addResult = libm.myAdd(6, 5, buffer, buffersize);
 console.log('addResult is:');
 console.log(addResult, typeof addResult);
-const actualString = ref.readCString(buffer, 0);
+let actualString = ref.readCString(buffer, 0);
 console.log('actualString:', actualString);
 console.log('buffer is', buffer); // 这个buffer存储的是C++中赋的值
 
@@ -56,6 +57,18 @@ console.log(
   buffer2.readInt32LE(4),
   buffer2.readInt32LE(8)
 );
+
+// 测试C语言中的回调函数 testInvokeCallback
+console.log('start testInvokeCallback');
+let outNumber = ref.alloc('int');
+let initSize = 10;
+var buffer3 = Buffer.alloc(initSize);
+libm.testInvokeCallback(9, 8, buffer3, outNumber);
+console.log('buffer3', buffer3);
+actualString = ref.readCString(buffer3, 0);
+const actualNumber = outNumber.deref();
+console.log('actualString:', actualString);
+console.log('actualNumber:', actualNumber);
 
 const subResult = libm.mySub(10, 7);
 
