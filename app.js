@@ -6,6 +6,30 @@ const bytePtr = ref.refType(ref.types.uchar);
 const dwPtr = ref.refType(ref.types.ulong);
 const voidPtr = ref.refType(ref.types.void);
 const uintPtr = ref.refType(ref.types.uint);
+// 结构体
+const StructType = require('ref-struct-napi');
+
+const int = ref.types.int;
+const char = ref.types.char;
+const double = ref.types.double;
+const uint = ref.types.uint;
+const byte = ref.types.uchar;
+const stringType = ref.types.CString;
+
+const TempInfo = StructType({
+  nChannelID: int,
+  nAction: int,
+  szName: stringType,
+  PTS: double,
+  nEventID: int,
+  nPresetID: uint,
+  nSequence: uint,
+  nEventRelevanceID: uint,
+  byReserved: stringType
+});
+
+const TempInfoPtr = ref.refType(TempInfo);
+
 const libFetchPictureAndTemp = ffi.Library('fetchPictureAndTemp.dll', {
   Add: ['int', ['int', 'int']],
   testInvokeCallback: ['void', ['int', 'int', bytePtr, dwPtr]],
@@ -18,7 +42,7 @@ const libFetchPictureAndTemp = ffi.Library('fetchPictureAndTemp.dll', {
       'bool',
       'uint',
       voidPtr,
-      voidPtr,
+      TempInfoPtr,
       bytePtr,
       uintPtr
     ]
@@ -41,6 +65,15 @@ let voidOutVar = ref.alloc(voidPtr);
 let byteOutVar = ref.alloc(bytePtr);
 const buffer5 = Buffer.alloc(12); // 分配空间
 let buffer5Size = ref.alloc(ref.types.uint); // 这里千万不要写成ref.alloc(uintPtr)
+
+// 测试使用结构体和结构体指针
+// const lib = new ffi.Library('mydll', {
+//   gettimeofday: ['void', [TimeValPtr]]
+// });
+// let tv = new TimeVal();
+// lib.gettimeofday(tv.ref());
+
+let tv = new TempInfoPtr();
 libFetchPictureAndTemp.CICDI_CLIENT_FetchPicture_DetectTemp(
   0,
   1,
@@ -48,10 +81,11 @@ libFetchPictureAndTemp.CICDI_CLIENT_FetchPicture_DetectTemp(
   true,
   110,
   voidVar,
-  voidOutVar,
+  tv.ref(),
   buffer5,
   buffer5Size
 );
 console.log(buffer5);
 const bb = buffer5Size.deref();
 console.log('buffer5Size.deref()', bb);
+console.log('tv', tv);
