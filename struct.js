@@ -12,7 +12,7 @@ const bytePtr = ref.refType(byte);
 const TempInfoType = StructType({
   nChannelID: int,
   nAction: int,
-  // szName: charPtr, // 不知道如何处理结构体中的字符串成员和数组成员
+  szName: 'string', // 不知道如何处理结构体中的字符串成员和数组成员
   PTS: double,
   nEventID: int,
   nPresetID: uint,
@@ -27,10 +27,20 @@ const libm = ffi.Library('testdll', {
 });
 
 const tv = new TempInfoType();
+// tv.szName = 'aabbccdd';
+tv.szName = Buffer.alloc(112); // 字符数组
+
+// tv.byReserved = Buffer.alloc(110); // 字节数组
+// let buf = Buffer.alloc(110);
+// console.log('tv.byReserved:');
+// console.log(tv.byReserved.length);
+// console.log(tv.byReserved);
 libm.getStructData(tv.ref());
+// console.log(tv);
 console.log(
   tv.nChannelID,
   tv.nAction,
+  tv.szName,
   tv.PTS,
   tv.nEventID,
   tv.nPresetID,
